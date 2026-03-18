@@ -1,0 +1,118 @@
+# ============================================
+# SECURITY: API Keys and Secrets (NEVER commit)
+# ============================================
+.env
+.env.*
+.env.local
+.env.*.local
+freeagentdev/*.yaml
+config.yaml
+secrets/
+.claude
+
+# ============================================
+# Python related
+# ============================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+*.pyd
+*.d
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.swp
+*.swo
+*~
+.Python
+
+# ============================================
+# Virtual environments
+# ============================================
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# ============================================
+# IDE and Editor files
+# ============================================
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+*.iml
+*.iws
+*.ipr
+*.sw[p-z]
+*.swp
+*.swo
+*~.nib
+.project
+.pydevproject
+.settings/
+*.sublime-text-project
+*.sublime-text-workspace
+
+# ============================================
+# OS specific files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# Logs and temporary files
+# ============================================
+*.log
+logs/
+*.sqlite3
+*.db
+*.sqlite
+*.pid
+*.seed
+*.sock
+*.out
+*.tmp
+
+# ============================================
+# Project specific (working files)
+# ============================================
+progress/
+workspace/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+.tox/
+coverage/
+.hypothesis/
+
+# ============================================
+# IDE-specific
+# ============================================
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/
+.pytest_cache
+*.ipynb_checkpoints
+
+# ============================================
+# Keep these templates (IMPORTANT)
+# ============================================
+!config.example.yaml
+!.env.example
