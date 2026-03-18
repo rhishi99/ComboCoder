@@ -164,53 +164,60 @@ Start with **Groq** - it's the easiest and fastest:
 
 ### **Step 1: Create Your Configuration File**
 
+Instead of creating the file manually, use the built-in `init` command to generate a default configuration file with the correct structure and model settings:
+
 ```bash
-# From the ComboCoder directory
-cp config.example.yaml config.yaml
+# Run from the ComboCoder directory
+python freeagent.py init
 ```
 
-### **Step 2: Edit config.yaml**
+This will create a `config.yaml` file inside the `freeagentdev/` directory.
 
-Open `config.yaml` in your text editor and add your API keys. Here's what the file looks like:
+### **Step 2: Edit freeagentdev/config.yaml**
+
+Open `freeagentdev/config.yaml` in your text editor and add your API keys. Here's a snippet of what the file looks like:
 
 ```yaml
 providers:
   groq:
     api_key_env: "GROQ_API_KEY"        # Environment variable name
-    api_key: ""                        # OR paste key directly here
-    base_url: null
     models:
-      planner: "groq/llama-3.3-70b-versatile"
+      planner: "groq/meta-llama/llama-4-scout-17b-16e-instruct"
       architect: "groq/llama-3.3-70b-versatile"
-      engineer: "groq/llama-3.1-70b-versatile"
+      engineer: "groq/qwen/qwen3-32b"
       reviewer: "groq/llama-3.3-70b-versatile"
     rate_limit:
       requests_per_minute: 30
       tokens_per_minute: 15000
-  
-  google:
-    api_key_env: "GOOGLE_API_KEY"
-    api_key: ""
-    # ... more config
 ```
 
-### **Configuration Options**
+### **Step 3: Add Your API Keys**
 
-#### **Option A: Using Environment Variables (Recommended - More Secure)**
+You have two ways to add your keys:
+
+#### **Option A: Using Environment Variables (Recommended - Most Secure)**
 
 1. Create a `.env` file in the `ComboCoder` directory:
+   ```bash
+   # .env file
+   GROQ_API_KEY=gsk_your_actual_key_here
+   OPENROUTER_API_KEY=sk-or-v1-your_key_here
+   NVIDIA_API_KEY=nvapi-your_key_here
+   ```
 
-```bash
-# .env file
-GROQ_API_KEY=gsk_your_actual_key_here
-GOOGLE_API_KEY=your_google_key_here
-NVIDIA_API_KEY=nvapi-your_key_here
+2. The system will automatically load these keys when you run the agent.
+
+#### **Option B: Pasting Directly in config.yaml**
+
+You can also paste the keys directly into the `api_key_env` field in `freeagentdev/config.yaml`:
+
+```yaml
+providers:
+  groq:
+    api_key_env: "gsk_your_actual_key_here" # Paste key here
 ```
 
-2. In `config.yaml`, keep `api_key: ""` empty and the `api_key_env` will automatically load from `.env`
-
-**⚠️ IMPORTANT**: The `.env` file is already in `.gitignore` - it won't be committed to Git.
-
+**⚠️ SECURITY NOTICE**: Your `config.yaml` and `.env` files are already in `.gitignore` so they won't be committed to Git. Never share these files or upload them to GitHub.
 #### **Option B: Direct Key in config.yaml (Easier for Local Development)**
 
 ```yaml

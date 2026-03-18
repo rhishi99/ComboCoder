@@ -24,10 +24,13 @@ The detailed guide covers:
    pip install -r requirements.txt
    ```
 
-2. **Configure API keys** (at least one):
+2. **Initialize & Configure**:
    ```bash
-   cp .env.example .env
-   # Edit .env and add your API keys
+   # Create your local config.yaml
+   python freeagent.py init
+
+   # Edit freeagentdev/config.yaml or set your API keys as env vars
+   # (e.g., export OPENROUTER_API_KEY="your-key")
    ```
 
 3. **Run**:
@@ -92,6 +95,9 @@ python freeagent.py "Complex feature" --sequential
 
 # Check provider status
 python freeagent.py status
+
+# Initialize configuration
+python freeagent.py init
 
 # List providers
 python freeagent.py providers

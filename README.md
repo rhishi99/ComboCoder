@@ -35,12 +35,22 @@ python freeagent.py init
 ```
 
 ### 3. Add Your API Keys
-Open `config.yaml` and add at least one free API key. We recommend [OpenRouter](https://openrouter.ai/keys) or [Groq](https://console.groq.com/keys).
+Open `freeagentdev/config.yaml` and add at least one free API key. We recommend [OpenRouter](https://openrouter.ai/keys) or [Groq](https://console.groq.com/keys).
+
+**Example:** Setting an environment variable is often easiest:
+```bash
+# Windows
+set OPENROUTER_API_KEY=sk-or-v1-your-key
+
+# macOS / Linux
+export OPENROUTER_API_KEY=sk-or-v1-your-key
+```
+
+Or edit the file directly:
 ```yaml
-llm:
-  provider: "openrouter"
-  api_key: "sk-or-v1-..."  # Paste your key here
-  model: "qwen/qwen3-coder:free"
+providers:
+  openrouter:
+    api_key_env: "OPENROUTER_API_KEY"  # Either the env var name OR paste the key here
 ```
 
 ---

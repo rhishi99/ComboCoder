@@ -183,3 +183,55 @@ def find_similar_files(root_path: Path, filename: str) -> List[str]:
             matches.append(str(path.relative_to(root_path)))
 
     return matches[:10]  # Limit to 10 matches
+
+
+class FileOperations:
+    """
+    A utility class for handling file operations such as creating files with content.
+    """
+    
+    def create_file(self, filename: str, content: str) -> None:
+        """
+        Creates a new file with the specified name and content.
+
+        This method creates a new file at the given path with the provided content.
+        It ensures parent directories exist, handles encoding, and includes error handling
+        for common file operations issues such as permission errors or disk full errors.
+
+        Args:
+            filename (str): The name of the file to be created. Can include path components.
+            content (str): The content to be written into the file.
+
+        Raises:
+            OSError: If there's an OS-level error during file creation (e.g., permission denied).
+            TypeError: If filename or content are not strings.
+            Exception: For any other unexpected errors during file creation.
+
+        Example:
+            >>> file_ops = FileOperations()
+            >>> file_ops.create_file("hello.txt", "Hello, World!")
+        """
+        if not isinstance(filename, str):
+            raise TypeError("filename must be a string")
+        if not isinstance(content, str):
+            raise TypeError("content must be a string")
+
+        try:
+            # Convert filename to Path object for easier manipulation
+            file_path = Path(filename)
+            
+            # Create parent directories if they don't exist
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Write content to file with UTF-8 encoding
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+                
+        except PermissionError as e:
+            raise OSError(f"Permission denied when creating file '{filename}': {e}") from e
+        except IsADirectoryError as e:
+            raise OSError(f"Cannot create file '{filename}': path is a directory") from e
+        except OSError as e:
+            raise OSError(f"OS error occurred when creating file '{filename}': {e}") from e
+        except Exception as e:
+            raise Exception(f"Unexpected error when creating file '{filename}': {e}") from e

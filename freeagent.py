@@ -16,7 +16,7 @@ from freeagentdev.cli import app
 if __name__ == "__main__":
     # If a direct task is provided (not a subcommand or option), route it to 'run'
     if len(sys.argv) > 1 and sys.argv[1] not in [
-        "onboard", "run", "status", "providers", "--help", "-h", "--version"
+        "onboard", "run", "status", "providers", "init", "--help", "-h", "--version"
     ]:
         sys.argv.insert(1, "run")
     app()

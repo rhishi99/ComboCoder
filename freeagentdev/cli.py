@@ -12,7 +12,7 @@ from rich.table import Table
 
 from freeagentdev.core.config_loader import load_config, get_config
 from freeagentdev.core.llm_client import LLMClient
-from freeagentdev.core.file_ops import get_repo_summary, apply_changes
+from freeagentdev.core.file_ops import FileOperations, get_repo_summary, apply_changes
 from freeagentdev.core.task_detector import TaskDetector
 from freeagentdev.agents.workflow import FreeAgentWorkflow
 
@@ -205,6 +205,94 @@ def providers():
                        "7. [cyan]DeepInfra[/cyan] - Cost-effective\n"
                        "8. [cyan]Fireworks[/cyan] - Fast inference\n"
                        "\n[dim]Set environment variables to enable providers.[/dim]"))
+
+
+@app.command()
+def create_file(
+    filename: str = typer.Argument(..., help="Name of the file to create"),
+    content: str = typer.Argument(..., help="Content to write to the file")
+):
+    """
+    Create a new file with the specified name and content.
+    
+    Example:
+        freeagentdev create_file hello.txt "Hello, World!"
+    """
+    file_ops = FileOperations()
+    try:
+        file_ops.create_file(filename, content)
+        console.print(Panel(f"[green]File '{filename}' created successfully![/green]"))
+    except Exception as e:
+        console.print(Panel(f"[red]Error creating file '{filename}': {e}[/red]"))
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def init():
+    """Initialize FreeAgentDev with a default config.yaml."""
+    config_dir = Path(__file__).parent
+    config_path = config_dir / "config.yaml"
+    
+    if config_path.exists():
+        console.print(f"[yellow]Configuration file already exists at {config_path}.[/yellow]")
+        return
+
+    import yaml
+    default_config = {
+        "providers": {
+            "groq": {
+                "api_key_env": "GROQ_API_KEY",
+                "models": {
+                    "planner": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
+                    "architect": "groq/llama-3.3-70b-versatile",
+                    "engineer": "groq/qwen/qwen3-32b",
+                    "reviewer": "groq/llama-3.3-70b-versatile"
+                }
+            },
+            "nvidia": {
+                "api_key_env": "NVIDIA_API_KEY",
+                "models": {
+                    "planner": "nvidia/meta/llama-3.3-70b-instruct",
+                    "architect": "nvidia/meta/llama-3.3-70b-instruct",
+                    "engineer": "nvidia/qwen/qwen2.5-coder-32b-instruct",
+                    "reviewer": "nvidia/meta/llama-3.3-70b-instruct"
+                }
+            },
+            "openrouter": {
+                "api_key_env": "OPENROUTER_API_KEY",
+                "models": {
+                    "planner": "openrouter/anthropic/claude-4.5-sonnet",
+                    "architect": "openrouter/anthropic/claude-4.5-sonnet",
+                    "engineer": "openrouter/qwen/qwen3-32b",
+                    "reviewer": "openrouter/anthropic/claude-3.5-sonnet"
+                }
+            }
+        },
+        "provider_order": ["groq", "nvidia", "openrouter"],
+        "llm": {
+            "temperature": 0.2,
+            "max_tokens": 8192,
+            "timeout_seconds": 120
+        },
+        "agents": {
+            "max_turns": 3,
+            "retry_on_failure": True,
+            "max_retries_per_request": 3,
+            "parallel_execution": True
+        },
+        "log_level": "info"
+    }
+
+    try:
+        with open(config_path, "w", encoding="utf-8") as f:
+            yaml.dump(default_config, f, sort_keys=False)
+        console.print(Panel(f"[green]Successfully created default configuration at:[/green]\n{config_path}\n\n"
+                           "[yellow]Next steps:[/yellow]\n"
+                           "1. Open the file and add your API keys\n"
+                           "2. Or set them as environment variables (e.g., OPENROUTER_API_KEY)"))
+    except Exception as e:
+        console.print(f"[red]Error creating configuration file: {e}[/red]")
+        raise typer.Exit(code=1)
 
 
 @app.callback()
