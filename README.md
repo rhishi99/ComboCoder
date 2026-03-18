@@ -1,88 +1,106 @@
-# FreeAgentDev: Multi-Provider AI Software Development Agent
+# 🤖 FreeAgentDev: Your Local AI-Powered Pair Programmer
 
-A smart, local AI coding assistant that automatically falls back between multiple LLM providers when rate limits are hit. Built for developers who need reliable, autonomous AI assistance directly on their local codebase.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Powered by LiteLLM](https://img.shields.io/badge/LLM-LiteLLM-orange.svg)](https://github.com/BerriAI/litellm)
+[![Workflow: LangGraph](https://img.shields.io/badge/Workflow-LangGraph-green.svg)](https://github.com/langchain-ai/langgraph)
 
-## 🚀 Overview
-
-FreeAgentDev is a **local-first** CLI tool that turns your natural language tasks into working code. It uses a 4-agent workflow (Planner, Architect, Engineer, Reviewer) orchestrated via LangGraph to ensure high-quality, reviewed code changes.
-
-### Key Features
-- **Local Execution**: Reads and writes files directly in your current working directory.
-- **Multi-Provider Fallback**: Automatically switches between 8+ LLM providers (Groq, NVIDIA, OpenRouter, Gemini, etc.) if rate limits are hit.
-- **Agentic Workflow**: Includes dedicated agents for planning, architecture, engineering, and review.
-- **Zero Cost**: Optimized for free-tier coding models like `Qwen-2.5-Coder`.
+**FreeAgentDev** is a local-first, multi-agent AI development tool that transforms your natural language tasks into production-ready code. It utilizes a sophisticated 4-agent workflow to plan, architect, engineer, and review changes directly on your local files—all while leveraging **free-tier LLM APIs** to keep your costs at zero.
 
 ---
 
-## 📖 Documentation Index
+## 🌟 Why FreeAgentDev?
 
-For detailed information, please refer to the following guides:
-
-- [**🚀 Onboarding Guide (ONBOARDING.md)**](./ONBOARDING.md): The best place to start. Covers quick setup and core features.
-- [**📘 User's Guide (USERS_GUIDE.md)**](./USERS_GUIDE.md): Comprehensive manual covering installation, 8+ provider setups, and advanced usage.
-- [**⚡ Quick Reference (QUICK_REFERENCE.md)**](./QUICK_REFERENCE.md): A "cheat sheet" for CLI commands and configuration.
-- [**✅ GitHub Checklist (GITHUB_CHECKLIST.md)**](./GITHUB_CHECKLIST.md): Best practices for using FreeAgentDev with GitHub repositories.
-- [**🏁 Project Completion (PROJECT_COMPLETION.md)**](./PROJECT_COMPLETION.md): Detailed technical summary of the project architecture and capabilities.
+*   **🛡️ Local-First & Secure**: Operates directly on your local codebase. No sensitive code is stored in the cloud.
+*   **🔄 Automatic Provider Fallback**: If one AI provider (like Groq) hits a rate limit, the system automatically switches to another (like OpenRouter or NVIDIA) without stopping.
+*   **🧪 Multi-Agent SOPs**: Inspired by MetaGPT, it uses a team of specialized agents (Planner, Architect, Engineer, Reviewer) to ensure high code quality.
+*   **💸 100% Free Tier Optimized**: Specifically tuned to work with high-performance free models like `Qwen-2.5-Coder` and `Llama-3.3`.
 
 ---
 
-## 🛠 Quick Start
+## 🚀 Fast Onboarding (3-Minute Setup)
 
-### 1. Installation
-
+### 1. Install Dependencies
+Clone the repository and install the required Python packages:
 ```bash
-# Clone the repository
-git clone <repository-url>
+git clone <your-repo-url>
 cd ComboCoder
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Configuration
-
-Initialize the configuration and add your API keys:
-
+### 2. Initialize Configuration
+Generate your local `config.yaml` file:
 ```bash
-# Initialize config.yaml
 python freeagent.py init
-
-# Generate the onboarding guide for reference
-python freeagent.py onboard
 ```
 
-Edit `config.yaml` with your API keys (e.g., from [OpenRouter](https://openrouter.ai/keys)).
+### 3. Add Your API Keys
+Open `config.yaml` and add at least one free API key. We recommend [OpenRouter](https://openrouter.ai/keys) or [Groq](https://console.groq.com/keys).
+```yaml
+llm:
+  provider: "openrouter"
+  api_key: "sk-or-v1-..."  # Paste your key here
+  model: "qwen/qwen3-coder:free"
+```
 
-### 3. Usage
+---
 
-Navigate to any project folder and run:
+## 🛠️ Usage Examples
 
+Navigate to your project folder and run the agent from the command line:
+
+### **General Task**
 ```bash
-# Example: Add a new feature
-python path/to/freeagent.py "Add a logout button to the navigation bar"
+python path/to/freeagent.py "Create a modern CSS grid layout for a landing page"
+```
+
+### **Bug Fix**
+```bash
+python path/to/freeagent.py "Fix the broken validation in login.js"
+```
+
+### **Code Refactor**
+```bash
+python path/to/freeagent.py "Refactor the database module to use async/await"
 ```
 
 ---
 
-## 🏗 Architecture
+## 📂 Documentation Hub
 
-FreeAgentDev uses a stateful graph to manage the development lifecycle:
-
-1.  **Planner**: Analyzes the task and repository structure to create a step-by-step plan.
-2.  **Architect**: Designs the specific file changes and technical structure.
-3.  **Engineer**: Implements the code changes directly to your local files.
-4.  **Reviewer**: Validates the changes and provides feedback for iteration if necessary.
-
----
-
-## 🛡 Security & Best Practices
-
-- **Never commit `config.yaml`**: This file contains your private API keys. It is ignored by `.gitignore` by default.
-- **Use `config.example.yaml`**: Share this template with others instead of your actual config.
-- **Review changes**: While the Reviewer agent validates code, always perform a final manual check before committing agent-generated code.
+| File | Best For... |
+| :--- | :--- |
+| [**📖 User's Guide**](./USERS_GUIDE.md) | Deep dive into installation, 8+ provider setups, and advanced config. |
+| [**🚀 Onboarding**](./ONBOARDING.md) | A simplified walkthrough for first-time users. |
+| [**⚡ Quick Reference**](./QUICK_REFERENCE.md) | CLI command "cheat sheet" and common patterns. |
+| [**✅ GitHub Checklist**](./GITHUB_CHECKLIST.md) | Best practices for committing agent-generated code safely. |
+| [**🏁 Project Completion**](./PROJECT_COMPLETION.md) | Technical architecture overview and system capabilities. |
 
 ---
 
-## License
+## 🧠 How It Works: The 4-Agent Workflow
 
-MIT License - See [LICENSE](./LICENSE) file for details.
+FreeAgentDev doesn't just "guess" code. it follows a rigorous **Standard Operating Procedure (SOP)**:
+
+1.  **📝 Planner**: Analyzes your repository and creates a logical step-by-step implementation plan.
+2.  **📐 Architect**: Designs the specific file structure and technical specifications required.
+3.  **💻 Engineer**: Writes the actual code, reading your local files for context and ensuring compatibility.
+4.  **🕵️ Reviewer**: Validates the code against your task. If errors are found, it sends feedback back to the Planner for another iteration (up to 3 times).
+
+---
+
+## 🔒 Security & Privacy
+
+*   **API Keys**: Your `config.yaml` is ignored by Git by default. Never share this file.
+*   **Local Data**: The agent only reads files in your current directory to gain context for the task.
+*   **Templates**: Use `config.example.yaml` to share configuration structures without sharing keys.
+
+---
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**Ready to start?** Run `python freeagent.py onboard` to generate your first local guide!
