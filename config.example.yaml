@@ -1,0 +1,182 @@
+# Multi-provider configuration for FreeAgentDev
+# Providers are tried in order with automatic fallback on rate limits
+# All providers listed offer generous free tiers
+
+providers:
+  # Groq - Fastest inference, generous free tier
+  groq:
+    api_key_env: "GROQ_API_KEY"  # Set env var or use direct key below
+    api_key: ""                  # Optional: direct API key (e.g., "gsk_xxxx")
+    base_url: null
+    models:
+      planner: "groq/llama-3.3-70b-versatile"
+      architect: "groq/llama-3.3-70b-versatile"
+      engineer: "groq/llama-3.1-70b-versatile"
+      reviewer: "groq/llama-3.3-70b-versatile"
+    rate_limit:
+      requests_per_minute: 30
+      tokens_per_minute: 15000
+    free_tier:
+      requests_per_day: 14400
+      tokens_per_day: 500000
+
+  # NVIDIA NIM - Wide model variety including GLM, Kimi, MiniMax
+  nvidia:
+    api_key_env: "NVIDIA_API_KEY"
+    api_key: ""                  # Optional: direct API key (e.g., "nvapi-xxxx")
+    base_url: "https://integrate.api.nvidia.com/v1"
+    models:
+      planner: "nvidia/meta/llama-3.3-70b-instruct"
+      architect: "nvidia/meta/llama-3.3-70b-instruct"
+      engineer: "nvidia/qwen/qwen2.5-coder-32b-instruct"
+      reviewer: "nvidia/meta/llama-3.3-70b-instruct"
+    rate_limit:
+      requests_per_minute: 40
+      tokens_per_minute: 20000
+
+  # OpenRouter - Aggregates many providers, some free models
+  openrouter:
+    api_key_env: "OPENROUTER_API_KEY"
+    api_key: ""                  # Optional: direct API key (e.g., "sk-or-xxxx")
+    base_url: "https://openrouter.ai/api/v1"
+    models:
+      planner: "openrouter/google/gemini-2.0-flash-001"
+      architect: "openrouter/meta-llama/llama-3.3-70b-instruct"
+      engineer: "openrouter/qwen/qwen3-32b"
+      reviewer: "openrouter/google/gemini-2.0-flash-001"
+    free_models:
+      - "openrouter/qwen/qwen3-coder:free"
+      - "openrouter/google/gemma-3-1b-it:free"
+      - "openrouter/meta-llama/llama-3.2-3b-instruct:free"
+    rate_limit:
+      requests_per_minute: 20
+      tokens_per_minute: 20000
+
+  # Google AI Studio - Gemini models, generous free tier
+  google:
+    api_key_env: "GOOGLE_API_KEY"
+    base_url: null
+    models:
+      planner: "gemini/gemini-2.0-flash"
+      architect: "gemini/gemini-2.0-flash"
+      engineer: "gemini/gemini-2.0-flash"
+      reviewer: "gemini/gemini-2.0-flash"
+    rate_limit:
+      requests_per_minute: 15
+      tokens_per_minute: 1000000
+    free_tier:
+      requests_per_day: 1500
+      tokens_per_day: 1500000
+
+  # Cerebras - Ultra-fast inference, free tier available
+  cerebras:
+    api_key_env: "CEREBRAS_API_KEY"
+    base_url: "https://api.cerebras.ai/v1"
+    models:
+      planner: "cerebras/llama-3.3-70b"
+      architect: "cerebras/llama-3.3-70b"
+      engineer: "cerebras/llama-3.1-70b"
+      reviewer: "cerebras/llama-3.3-70b"
+
+  # Together AI - Many open models, free credits
+  together:
+    api_key_env: "TOGETHER_API_KEY"
+    base_url: "https://api.together.xyz/v1"
+    models:
+      planner: "together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo"
+      architect: "together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo"
+      engineer: "together_ai/Qwen/Qwen2.5-Coder-32B-Instruct"
+      reviewer: "together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo"
+
+  # DeepInfra - Cost-effective, some free tier
+  deepinfra:
+    api_key_env: "DEEPINFRA_API_KEY"
+    base_url: "https://api.deepinfra.com/v1/openai"
+    models:
+      planner: "deepinfra/meta-llama/Llama-3.3-70B-Instruct"
+      architect: "deepinfra/meta-llama/Llama-3.3-70B-Instruct"
+      engineer: "deepinfra/Qwen/Qwen2.5-Coder-32B-Instruct"
+      reviewer: "deepinfra/meta-llama/Llama-3.3-70B-Instruct"
+
+  # Fireworks AI - Fast inference, free credits
+  fireworks:
+    api_key_env: "FIREWORKS_API_KEY"
+    base_url: "https://api.fireworks.ai/inference/v1"
+    models:
+      planner: "fireworks/accounts/fireworks/models/llama-v3p3-70b-instruct"
+      architect: "fireworks/accounts/fireworks/models/llama-v3p3-70b-instruct"
+      engineer: "fireworks/accounts/fireworks/models/qwen2p5-coder-32b-instruct"
+      reviewer: "fireworks/accounts/fireworks/models/llama-v3p3-70b-instruct"
+
+  # OpenCode - Community-driven
+  opencode:
+    api_key_env: "OPENCODE_API_KEY"
+    base_url: "https://api.opencode.ai/v1"
+    models:
+      planner: "opencode/llama-3.3-70b"
+      architect: "opencode/llama-3.3-70b"
+      engineer: "opencode/qwen-2.5-coder-32b"
+      reviewer: "opencode/llama-3.3-70b"
+
+# Provider priority order (primary first, fallbacks after)
+# Configure which providers to use and in what order
+provider_order:
+  - groq        # Fastest, good free tier
+  - nvidia      # Wide model variety
+  - google      # Gemini, generous limits
+  - openrouter  # Aggregator fallback
+  # Add more providers as needed
+
+# Global LLM settings
+llm:
+  temperature: 0.2
+  max_tokens: 8192
+  timeout_seconds: 120
+
+agents:
+  max_turns: 3
+  retry_on_failure: true
+  max_retries_per_request: 3
+  retry_delay_seconds: 5
+  fallback_on_rate_limit: true
+  # Parallel execution settings
+  parallel_execution: true
+  max_parallel_agents: 2
+  # Sequential fallback if parallel fails
+  sequential_fallback: true
+
+# Task detection settings
+task_detection:
+  auto_detect_mode: true
+  parallel_keywords:
+    - "parallel"
+    - "simultaneously"
+    - "at the same time"
+    - "concurrently"
+  sequential_keywords:
+    - "sequential"
+    - "step by step"
+    - "one after another"
+    - "then"
+  prd_keywords:
+    - "PRD"
+    - "requirements"
+    - "spec"
+    - "specification"
+
+  # Document paths to check for task context
+  context_documents:
+    - "PRD.md"
+    - "REQUIREMENTS.md"
+    - "SPEC.md"
+    - "docs/prd.md"
+    - "docs/requirements.md"
+
+log_level: "info"
+
+# Rate limit handling
+rate_limit:
+  strategy: "sliding_window"  # or "token_bucket"
+  cooldown_seconds: 60
+  max_wait_seconds: 300
+  track_usage: true
