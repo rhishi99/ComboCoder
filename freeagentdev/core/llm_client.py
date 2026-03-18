@@ -7,6 +7,11 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from freeagentdev.core.config_loader import get_config, ConfigLoader
 
+# Silence LiteLLM output
+litellm.suppress_debug_info = True
+os.environ["LITELLM_LOG"] = "ERROR"
+litellm.set_verbose = False
+
 class RateLimitTracker:
     """Tracks API usage for rate limiting."""
 
@@ -67,6 +72,10 @@ class LLMClient:
         # Track provider health
         self.provider_errors = defaultdict(int)
         self.provider_cooldown_until = {}
+        
+        # Tracking for UI
+        self.last_provider = "none"
+        self.last_model = "none"
 
     def _get_available_providers(self) -> List[str]:
         """Get list of providers with valid API keys."""
@@ -147,6 +156,10 @@ class LLMClient:
 
         for current_provider in providers_to_try:
             try:
+                # Update metadata for UI
+                self.last_provider = current_provider
+                self.last_model = self._get_model(current_provider, role or "planner")
+                
                 result = self._try_provider(current_provider, role, messages)
                 # Reset error count on success
                 self.provider_errors[current_provider] = 0

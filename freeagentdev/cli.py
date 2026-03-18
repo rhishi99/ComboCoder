@@ -25,37 +25,38 @@ def onboard():
     """Generates ONBOARDING.md with setup steps."""
     content = """# ONBOARDING.md - FreeAgentDev
 
-Welcome to **FreeAgentDev**! Your local AI-powered developer agent with multi-provider support.
+Welcome to **FreeAgentDev**! Your local AI-powered developer agent.
 
-## 🚀 Setup
+## 🚀 One-Click Setup
 
-1. **Configure API Keys**: Set environment variables for providers you want to use:
-   ```bash
-   export GROQ_API_KEY="your-key"         # Fastest inference
-   export NVIDIA_API_KEY="your-key"       # Wide model variety (GLM, Kimi, MiniMax)
-   export OPENROUTER_API_KEY="your-key"   # Many model options
-   export GOOGLE_API_KEY="your-key"       # Gemini models
-   export CEREBRAS_API_KEY="your-key"     # Ultra-fast
-   export TOGETHER_API_KEY="your-key"     # Open models
-   ```
+### **Windows**
+1. Run the PowerShell setup script: `.\\setup_windows.ps1`
+2. Add your API key to `freeagentdev/config.yaml`.
+3. **Restart terminal** and run `freeagent "task"` anywhere!
 
-2. **Run**: Execute the agent with your task:
-   ```bash
-   python freeagent.py "Add a hello world python script"
-   ```
+### **macOS / Linux**
+1. Run the setup script: `bash setup_unix.sh`
+2. Follow instructions to add to PATH.
+3. Add your API key to `freeagentdev/config.yaml`.
+4. **Restart terminal** and run `freeagent "task"` anywhere!
 
 ## 🛠 Features
-- **8+ Provider Support**: Groq, NVIDIA NIM, OpenRouter, Google, Cerebras, Together, DeepInfra, Fireworks
-- **Automatic Fallback**: Switches providers on rate limits automatically
-- **4-Agent Workflow**: Planner, Architect, Engineer, and Reviewer work together
-- **Parallel/Sequential Execution**: Automatically detects and handles task complexity
-- **Context Awareness**: Reads PRD.md, REQUIREMENTS.md, SPEC.md automatically
-- **High Quality Standards**: SOLID principles, clean code, proper error handling
+- **🔄 Multi-Provider Fallback**: Automatic switching between Groq, NVIDIA, OpenRouter, etc.
+- **🔍 Inquiry Mode**: Automatically detects when you want an explanation instead of code changes.
+- **📡 Router Visibility**: Shows exactly which provider and model are working in real-time.
+- **🧪 4-Agent Workflow**: Planner, Architect, Engineer, and Reviewer SOP.
 
-## 📋 Task Modes
-- **Parallel**: Use keywords like "parallel", "simultaneously", "concurrently"
-- **Sequential**: Use keywords like "step by step", "one after another"
-- **Auto**: System detects automatically based on task complexity
+## 📋 Example Commands
+```bash
+# Code Task
+freeagent "Create a Python timer script"
+
+# Inquiry Task
+freeagent "Explain how the multi-agent workflow works in this project"
+
+# Force Sequential Mode
+freeagent "Step by step, create a login form and then the backend" --sequential
+```
 """
     with open("ONBOARDING.md", "w", encoding="utf-8") as f:
         f.write(content)
@@ -91,6 +92,11 @@ def status():
     except Exception as e:
         console.print(f"[red]Error loading configuration: {e}[/red]")
 
+
+import warnings
+# Suppress Pydantic and other library warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", module="pydantic")
 
 @app.command(name="run")
 def task_run(
@@ -144,7 +150,8 @@ def task_run(
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
-        console=console
+        console=console,
+        transient=True # Keep the terminal clean
     ) as progress:
 
         # Step 1: Analyze repo
@@ -152,11 +159,13 @@ def task_run(
         summary = get_repo_summary(root_path)
 
         # Step 2: Build and run workflow
-        progress.add_task(description="[cyan]Running agent workflow (this may take 1-2 mins)...", total=None)
         workflow = FreeAgentWorkflow(llm)
+        
+        # We'll use a shared task ID for agent updates
+        agent_task_id = progress.add_task(description="[cyan]Initializing agents...", total=None)
 
         try:
-            final_state = workflow.run(root_path, task)
+            final_state = workflow.run(root_path, task, progress, agent_task_id)
         except Exception as e:
             progress.stop()
             console.print(f"\n[red]Workflow Error: {e}[/red]")
@@ -179,11 +188,17 @@ def task_run(
             f"Modified {len(modified_files)} files: [cyan]{', '.join(modified_files)}[/cyan]"
         )
     else:
-        console.print("[yellow]No code changes were applied. Check the agent's output below.[/yellow]")
-        console.print(Markdown(final_state.get("code_changes", "No output")))
+        # If no changes, it might be an informational task
+        if final_state.get("review_feedback"):
+            console.print(Panel(
+                Markdown(final_state["review_feedback"]),
+                title="Agent Response"
+            ))
+        else:
+            console.print("[yellow]No code changes were applied.[/yellow]")
 
-    # Show review result
-    if final_state.get("review_feedback"):
+    # Show review result if it's not the main answer
+    if modified_files and final_state.get("review_feedback"):
         if "PASS" in final_state["review_feedback"].upper():
             console.print(f"[green]✓ Review: PASSED[/green]")
         elif "MAX TURNS" in final_state["review_feedback"]:

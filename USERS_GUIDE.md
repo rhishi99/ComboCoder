@@ -285,19 +285,36 @@ The system automatically detects complexity and adjusts execution strategy.
 
 #### **1. Run a Task**
 ```bash
-# Basic
-python freeagent.py "Your task description here"
+# Basic (Auto-detection of mode)
+freeagent "Your task description here"
 
 # Force parallel execution (multiple agents work simultaneously)
-python freeagent.py "Create UI components and database schema" --parallel
+freeagent "Create UI components and database schema" --parallel
 
 # Force sequential execution (one after another)
-python freeagent.py "Setup database, then create models" --sequential
+freeagent "Setup database, then create models" --sequential
 ```
+
+### **Advanced Execution Modes**
+
+#### **Inquiry Mode (Exploration & Analysis)**
+FreeAgentDev automatically detects when a task is purely informational (e.g., "Explain how the authentication works" or "Summarize the project structure").
+In this mode:
+- No files are modified on disk.
+- The **Planner** analyzes the codebase and provides a detailed textual explanation.
+- The workflow ends early, saving tokens and time.
+
+#### **Real-Time Router Visibility**
+The CLI provides complete transparency into which AI models are doing the work. During execution, you will see status updates like:
+`📝 Planner is thinking... (GROQ/llama-3.3-70b)`
+`💻 Engineer is writing code... (OPENROUTER/qwen-2.5-coder)`
+
+This allows you to verify exactly which provider is currently active and which model is generating your code.
 
 #### **2. Check Provider Status**
 ```bash
-python freeagent.py status
+freeagent status
+```
 ```
 
 Shows:

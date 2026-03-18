@@ -29,6 +29,9 @@ class AgentState(TypedDict):
     execution_mode: str  # "parallel" or "sequential"
     subtasks: List[str]
     subtask_results: Dict[str, str]
+    # UI updates
+    progress: Optional[Any]
+    progress_task_id: Optional[Any]
 
 
 class FreeAgentWorkflow:
@@ -51,8 +54,19 @@ class FreeAgentWorkflow:
     def _get_task_detector(self, root_path: Path) -> TaskDetector:
         return TaskDetector(root_path)
 
+    def _update_ui(self, state: AgentState, message: str):
+        """Helper to update the CLI progress bar."""
+        if state.get("progress") and state.get("progress_task_id"):
+            provider = self.llm_client.last_provider.upper()
+            model = self.llm_client.last_model.split("/")[-1]
+            if provider != "NONE":
+                state["progress"].update(state["progress_task_id"], description=f"[cyan]{message} [bold magenta]({provider}/{model})[/bold magenta]")
+            else:
+                state["progress"].update(state["progress_task_id"], description=f"[cyan]{message}")
+
     def planner_node(self, state: AgentState) -> dict:
         """Plan the implementation based on task and context."""
+        self._update_ui(state, "📝 Planner is thinking...")
         task_detector = self._get_task_detector(state["root_path"])
 
         # Gather context documents if available
@@ -75,6 +89,16 @@ class FreeAgentWorkflow:
             feedback=state.get("review_feedback", ""),
             context_docs=context_docs
         )
+        
+        self._update_ui(state, "📝 Planner finished.")
+
+        # Handle purely informational tasks
+        if "[NO_CODE_CHANGES_REQUIRED]" in plan:
+            return {
+                "plan": plan,
+                "review_feedback": plan.replace("[NO_CODE_CHANGES_REQUIRED]", "").strip(),
+                "current_agent": END
+            }
 
         return {
             "plan": plan,
@@ -86,15 +110,18 @@ class FreeAgentWorkflow:
 
     def architect_node(self, state: AgentState) -> dict:
         """Design the technical specification."""
+        self._update_ui(state, "📐 Architect is designing...")
         design = self.architect.design(
             plan=state["plan"],
             repo_summary=state["repo_summary"],
             context_docs=state.get("context_docs", "")
         )
-        return {"design": design, "current_agent": " context_gatherer"}
+        self._update_ui(state, "📐 Architect finished.")
+        return {"design": design, "current_agent": "context_gatherer"}
 
     def context_gatherer_node(self, state: AgentState) -> dict:
         """Fetch relevant files mentioned in the design."""
+        self._update_ui(state, "🔍 Gathering context files...")
         context = get_context_from_design(state["root_path"], state["design"])
 
         # Also include context docs
@@ -114,14 +141,17 @@ class FreeAgentWorkflow:
             state.get("execution_mode") == "parallel" and
             state.get("subtasks") and
             state.get("turns", 0) == 0):  # Only on first iteration
+            self._update_ui(state, "💻 Engineer is working (parallel mode)...")
             return self._parallel_engineering(state)
 
         # Sequential execution
+        self._update_ui(state, "💻 Engineer is writing code...")
         code_changes = self.engineer.implement(
             design_doc=state["design"],
             repo_context=state["repo_context"],
             task=state["task"]
         )
+        self._update_ui(state, "💻 Engineer finished.")
         return {"code_changes": code_changes, "current_agent": "reviewer"}
 
     def _parallel_engineering(self, state: AgentState) -> dict:
@@ -230,13 +260,15 @@ class FreeAgentWorkflow:
 
         return workflow.compile()
 
-    def run(self, root_path: Path, task: str) -> dict:
+    def run(self, root_path: Path, task: str, progress: Any = None, task_id: Any = None) -> dict:
         """
         Run the complete workflow.
 
         Args:
             root_path: Path to the repository
             task: The natural language task
+            progress: Optional rich progress object
+            task_id: Optional rich task ID
 
         Returns:
             Final state with all results
@@ -264,7 +296,9 @@ class FreeAgentWorkflow:
             "context_docs": context_docs,
             "execution_mode": execution_mode,
             "subtasks": [],
-            "subtask_results": {}
+            "subtask_results": {},
+            "progress": progress,
+            "progress_task_id": task_id
         }
 
         # Run workflow

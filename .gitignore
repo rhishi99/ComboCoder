@@ -91,6 +91,7 @@ logs/
 # ============================================
 # Project specific (working files)
 # ============================================
+tests/
 progress/
 workspace/
 .pytest_cache/

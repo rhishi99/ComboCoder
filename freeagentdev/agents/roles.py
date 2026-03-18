@@ -23,13 +23,14 @@ Your job is to analyze the repository structure and requirements, then create a 
 
 {f"## Previous Review Feedback\n{feedback}" if feedback else ""}
 
-## Your Response
-Provide a comprehensive implementation plan that includes:
-1. **Architecture Overview**: High-level approach and design patterns to use
-2. **File Changes**: List all files to create or modify with their purposes
-3. **Implementation Steps**: Ordered steps with clear dependencies
-4. **Best Practices**: Design patterns, SOLID principles, error handling, testing considerations
-5. **Potential Risks**: Edge cases and potential issues to handle
+Your Response:
+1. **Classification**: If the task is purely informational (e.g., "explain", "summarize", "how does X work") and does NOT require file modifications, start your response with EXACTLY: `[NO_CODE_CHANGES_REQUIRED]` followed by your detailed explanation.
+2. **Implementation Plan**: If changes ARE required, provide a comprehensive plan that includes:
+   - Architecture Overview: High-level approach and design patterns to use
+   - File Changes: List all files to create or modify with their purposes
+   - Implementation Steps: Ordered steps with clear dependencies
+   - Best Practices: Design patterns, SOLID principles, error handling, testing considerations
+   - Potential Risks: Edge cases and potential issues to handle
 
 Be specific, thorough, and focus on code quality. Do NOT write code yet.
 """

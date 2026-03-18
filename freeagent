@@ -1,0 +1,4 @@
+#!/bin/bash
+# FreeAgentDev Unix Wrapper
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+"$BASE_DIR/.venv/bin/python3" "$BASE_DIR/freeagent.py" "$@"
