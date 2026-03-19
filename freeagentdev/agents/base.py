@@ -11,12 +11,17 @@ class BaseAgent:
         self.last_provider = None
         self.last_model = None
 
-    def generate(self, prompt: str, messages: list = None) -> str:
+    def generate(self, prompt: str, messages: list = None, progress_callback=None) -> str:
         """
         Sends a request to the LLM for the current role.
         Uses multi-provider fallback automatically.
         """
-        result = self.llm_client.complete(prompt=prompt, role=self.role, messages=messages)
+        result = self.llm_client.complete(
+            prompt=prompt, 
+            role=self.role, 
+            messages=messages,
+            progress_callback=progress_callback
+        )
         return result
 
     def generate_with_provider(self, prompt: str, provider: str, messages: list = None) -> str:

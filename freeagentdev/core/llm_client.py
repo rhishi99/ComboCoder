@@ -126,7 +126,8 @@ class LLMClient:
         prompt: str,
         role: str = None,
         messages: list = None,
-        provider: str = None
+        provider: str = None,
+        progress_callback=None
     ) -> str:
         """
         Complete a prompt with automatic provider fallback.
@@ -136,6 +137,7 @@ class LLMClient:
             role: Agent role (planner, architect, engineer, reviewer)
             messages: Optional message list for chat completion
             provider: Optional specific provider to use
+            progress_callback: Optional callable for logging fallback events
 
         Returns:
             The completion text
@@ -176,10 +178,14 @@ class LLMClient:
 
                 # Check if it's a rate limit error
                 if "rate" in str(e).lower() and self.fallback_on_rate_limit:
+                    if progress_callback:
+                        progress_callback(f"⚠️ {current_provider.upper()} rate limited. Switching to next provider...")
                     continue  # Try next provider
 
                 # For other errors, retry with delay
                 if self.provider_errors[current_provider] < self.max_retries:
+                    if progress_callback:
+                        progress_callback(f"⚠️ {current_provider.upper()} error. Retrying in {self.retry_delay}s...")
                     time.sleep(self.retry_delay)
                     try:
                         result = self._try_provider(current_provider, role, messages)
