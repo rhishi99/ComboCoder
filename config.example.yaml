@@ -172,7 +172,7 @@ task_detection:
     - "docs/prd.md"
     - "docs/requirements.md"
 
-log_level: "info"
+log_level: "error"
 
 # Rate limit handling
 rate_limit:
