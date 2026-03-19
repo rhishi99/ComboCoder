@@ -92,11 +92,12 @@ class FreeAgentWorkflow:
         
         self._update_ui(state, "📝 Planner finished.")
 
-        # Handle purely informational tasks
-        if "[NO_CODE_CHANGES_REQUIRED]" in plan:
+        # Handle purely informational tasks deterministically
+        if execution_mode == "inquiry" or "[NO_CODE_CHANGES_REQUIRED]" in plan:
+            cleaned_plan = plan.replace("[NO_CODE_CHANGES_REQUIRED]", "").strip()
             return {
                 "plan": plan,
-                "review_feedback": plan.replace("[NO_CODE_CHANGES_REQUIRED]", "").strip(),
+                "review_feedback": cleaned_plan,
                 "current_agent": END
             }
 

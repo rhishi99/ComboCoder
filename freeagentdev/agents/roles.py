@@ -58,7 +58,7 @@ Your job is to transform the implementation plan into a detailed technical desig
 
 ## Your Response
 For EACH file to be created or modified, provide:
-1. **File Path**: Exact relative path (e.g., `src/utils/helpers.py`)
+1. **File Path**: Exact relative path (e.g., `src/utils/helpers.py`). DO NOT include the root project folder name in the path.
 2. **Purpose**: What this file does and why
 3. **Dependencies**: Other files/modules it depends on
 4. **Interface**: Function/class signatures, parameters, return types
@@ -72,7 +72,7 @@ Use this exact format for each file:
 **Interface**: [signatures]
 **Implementation Notes**: [details]
 
-Be precise with file paths - they will be used directly.
+Be precise with file paths - they will be used directly. NEVER prepend the root directory name.
 """
         return self.generate(prompt)
 
@@ -116,6 +116,7 @@ For EACH file, use this EXACT format:
 
 Only output code blocks. No explanations outside the blocks.
 Ensure the path matches exactly what was specified in the design.
+CRITICAL: The file path MUST be relative to the project root. DO NOT include the root directory name itself in the path.
 Include ALL code - no placeholders, no "// implementation here", no TODOs.
 """
         return self.generate(prompt)

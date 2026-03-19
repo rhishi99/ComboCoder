@@ -16,15 +16,23 @@ class TaskDetector:
 
     def detect_execution_mode(self, task: str) -> str:
         """
-        Detect whether task should run in parallel or sequential mode.
+        Detect whether task should run in parallel, sequential, or inquiry mode.
 
-        Returns: "parallel", "sequential", or "auto"
+        Returns: "inquiry", "parallel", "sequential", or "auto"
         """
+        task_lower = task.lower()
+
+        # Check for inquiry/informational tasks first to protect the codebase
+        inquiry_keywords = ["explain", "summarize", "what is", "how does", "describe", "analyze", "check project"]
+        
+        # If the task starts with an inquiry word, or is very short and contains one
+        if any(task_lower.startswith(kw) for kw in inquiry_keywords) or \
+           (any(kw in task_lower for kw in inquiry_keywords) and "create" not in task_lower and "add" not in task_lower and "fix" not in task_lower and "update" not in task_lower and "modify" not in task_lower):
+            return "inquiry"
+
         auto_detect = self.task_config.get("auto_detect_mode", True)
         if not auto_detect:
             return "auto"
-
-        task_lower = task.lower()
 
         # Check for parallel keywords
         parallel_keywords = self.task_config.get("parallel_keywords", [])

@@ -28,7 +28,7 @@ def is_ignored(path: Path) -> bool:
 
 def get_repo_summary(root_path: Path, max_depth: int = 4) -> str:
     """Generates a tree-like summary of the current directory."""
-    summary_lines = [f"Root: {root_path.name}/"]
+    summary_lines = ["Project Root (./)"]
 
     def _walk(current: Path, depth: int):
         if depth > max_depth:
@@ -143,7 +143,22 @@ def apply_changes(root_path: Path, code_changes: str) -> List[str]:
         if not rel_path_str or not content.strip():
             continue
 
-        full_path = root_path / rel_path_str
+        # DEFENSE: Strip root folder name if LLM included it by mistake
+        # e.g. "breeze_api - Copy/src/main.py" -> "src/main.py"
+        if rel_path_str.startswith(f"{root_path.name}/") or rel_path_str.startswith(f"{root_path.name}\\"):
+            rel_path_str = rel_path_str[len(root_path.name) + 1:]
+
+        # ABSOLUTE SECURITY GUARDRAIL: Prevent directory traversal (e.g., ../../../etc/passwd)
+        try:
+            full_path = (root_path / rel_path_str).resolve()
+            # Ensure the resolved path is strictly within the root_path
+            if not str(full_path).startswith(str(root_path.resolve())):
+                print(f"SECURITY WARNING: Agent attempted to write outside project root: {rel_path_str}")
+                continue
+        except Exception as e:
+            print(f"Path resolution error for {rel_path_str}: {e}")
+            continue
+
         try:
             full_path.parent.mkdir(parents=True, exist_ok=True)
             with open(full_path, "w", encoding="utf-8") as f:
@@ -159,7 +174,20 @@ def apply_changes(root_path: Path, code_changes: str) -> List[str]:
         if not rel_path_str or not content.strip():
             continue
 
-        full_path = root_path / rel_path_str
+        # DEFENSE: Strip root folder name if LLM included it by mistake
+        if rel_path_str.startswith(f"{root_path.name}/") or rel_path_str.startswith(f"{root_path.name}\\"):
+            rel_path_str = rel_path_str[len(root_path.name) + 1:]
+
+        # ABSOLUTE SECURITY GUARDRAIL: Prevent directory traversal
+        try:
+            full_path = (root_path / rel_path_str).resolve()
+            if not str(full_path).startswith(str(root_path.resolve())):
+                print(f"SECURITY WARNING: Agent attempted to write outside project root: {rel_path_str}")
+                continue
+        except Exception as e:
+            print(f"Path resolution error for {rel_path_str}: {e}")
+            continue
+
         try:
             full_path.parent.mkdir(parents=True, exist_ok=True)
             with open(full_path, "w", encoding="utf-8") as f:
