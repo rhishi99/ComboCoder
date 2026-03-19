@@ -7,7 +7,7 @@ Write-Host " Starting FreeAgentDev Setup..." -ForegroundColor Cyan
 # 1. Create Virtual Environment
 if (!(Test-Path ".venv")) {
     Write-Host " Creating virtual environment..." -ForegroundColor Yellow
-    python -m venv .venv
+    py -3.12 -m venv .venv
 }
 
 # 2. Install Dependencies

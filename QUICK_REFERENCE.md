@@ -54,8 +54,17 @@ python freeagent.py "Create database, then migrations" --sequential
 # Check providers
 python freeagent.py providers
 
-# Check usage/limits
+# Check status & active provider
 python freeagent.py status
+
+# Example output:
+# Groq: 120/500k tokens (84%) — *CURRENT PROVIDER*
+# Google: 0/1.5M tokens
+# NVIDIA: $25.50/$1000 credits (Available)
+
+# During task execution, you'll see:
+# 📝 Planner is thinking... (GROQ/llama-3.3-70b)
+# 💻 Engineer is writing code... (OPENROUTER/qwen-2.5-coder)
 ```
 
 ---
